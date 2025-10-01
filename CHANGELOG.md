@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration system with config.yaml and .env support
 - Makefile for easy command access
 - Development workflow documentation (CLAUDE.md, .cursor/rules/project-workflow.mdc)
+- ChromaDB service with dual collections (per-user memories, global knowledge)
+- MCP server with memory tools (memory_store, memory_lookup)
+- MCP server with knowledge tools (knowledge_store, knowledge_search, knowledge_delete)
+- Pydantic configuration management with YAML and environment variable support
 
 ### Changed
 
