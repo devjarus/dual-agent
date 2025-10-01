@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MCP server with memory tools (memory_store, memory_lookup)
 - MCP server with knowledge tools (knowledge_store, knowledge_search, knowledge_delete)
 - Pydantic configuration management with YAML and environment variable support
+- Research Agent with Claude streaming and MCP tool integration
+- Crawler Agent with Ollama-powered link filtering and user steering
+- Web scraping utilities with robots.txt support
 
 ### Changed
 
