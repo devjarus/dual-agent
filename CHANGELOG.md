@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Research Agent with Claude streaming and MCP tool integration
 - Crawler Agent with Ollama-powered link filtering and user steering
 - Web scraping utilities with robots.txt support
+- Comprehensive testing infrastructure with pytest
+- Unit tests for configuration and ChromaDB service
+- Pre-commit hooks for code quality and testing
+- Test coverage reporting
 
 ### Changed
 

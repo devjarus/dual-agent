@@ -1,0 +1,67 @@
+# Pre-commit hooks configuration
+# See https://pre-commit.com for more information
+
+repos:
+  # Python formatting and linting
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        language_version: python3.11
+        args: [--line-length=88]
+        files: ^backend/
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.14
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^backend/
+
+  # Python tests
+  - repo: local
+    hooks:
+      - id: pytest-unit
+        name: pytest (unit tests)
+        entry: bash -c 'cd backend && python -m pytest tests/unit -v -m unit'
+        language: system
+        files: ^backend/
+        pass_filenames: false
+        always_run: false  # Only run if backend files change
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^\.github/
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # YAML formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.12.0
+    hooks:
+      - id: pretty-format-yaml
+        args: [--autofix, --indent, '2']
+        exclude: ^\.github/
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^CHANGELOG\.md$
+
+# Configuration
+default_language_version:
+  python: python3.11
+
+# Run hooks on all files when installing
+default_install_hook_types: [pre-commit, pre-push]
