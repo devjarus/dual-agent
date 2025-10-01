@@ -1,0 +1,320 @@
+---
+description: Coding standards and workflow for AgentX v1-prototype
+globs:
+alwaysApply: true
+---
+# AgentX v1-Prototype Development Guide
+
+Instructions for AI coding agents developing the AgentX dual-agent system.
+
+## 1. Coding Philosophy
+
+### Iterative Development
+- **Small Steps:** Work incrementally. Each change should be verifiable.
+- **Test When Possible:** Write tests for critical functionality (agents, MCP tools, API endpoints).
+- **Simplest Solution First:** Avoid over-engineering. Get it working, then refine.
+
+### SOLID Principles
+- **Single Responsibility:** Each class/function has one purpose.
+- **Open/Closed:** Open for extension, closed for modification.
+- **Dependency Inversion:** Depend on abstractions, not concrete implementations.
+
+### Simplicity Over Complexity
+- **KISS:** Keep it simple. Choose the straightforward solution.
+- **YAGNI:** Don't add features until needed.
+- **Clarity is Key:** Write readable code. Names should be self-explanatory.
+
+### Self-Documenting Code
+- **Meaningful Names:** Variables, functions, classes should be descriptive.
+- **Minimal Comments:** Code should be clear. Comments explain *why*, not *what*.
+- **Consistent Formatting:** Use `black` and `ruff` for Python, ESLint for TypeScript.
+
+## 2. Grounding Documents
+
+**All development must align with design documents. These are the source of truth:**
+
+- **`docs/architecture.md`**: System design, components, data flows
+- **`docs/implementation-plan.md`**: Phase-by-phase build guide with checkpoints
+- **`docs/technical-reference.md`**: API endpoints, MCP tools, SSE events, config options
+
+**Before writing code:**
+1. Read relevant section in `docs/architecture.md`
+2. Check implementation phase in `docs/implementation-plan.md`
+3. Review API/tool signatures in `docs/technical-reference.md`
+
+## 3. Development Workflow
+
+### For Any Feature, Bug Fix, or Refactoring:
+
+#### Step 1: Analyze and Plan
+- **Understand the Goal:** What is the user requesting?
+- **Consult Docs:** Read relevant sections in `docs/`
+- **Examine Code:** Review existing code for patterns and consistency
+- **Create TODO List:** Break down work into small steps using TodoWrite tool
+
+#### Step 2: Implement
+- **Write Code:** Follow the implementation plan
+- **For Critical Paths:** Write tests (agents, MCP tools, API routes)
+- **Run Tests:** `make test` to verify nothing broke
+- **Verify Manually:** Use `make dev` and test the feature in the UI
+
+#### Step 3: Update Documentation & Changelog
+See section 4 (Documentation Sync Rules) for details on what to update.
+
+**Quick reference:**
+- Architecture changes → Update `docs/architecture.md`
+- API/tool changes → Update `docs/technical-reference.md`
+- User-facing changes → Update `CHANGELOG.md` under `[Unreleased]`
+
+#### Step 4: Verify
+- **Lint:** `make test` runs linting automatically
+- **Test:** Run the test suite
+- **Manual Test:** Start services with `make dev` and verify in browser
+
+#### Step 5: Commit (When Applicable)
+Use conventional commits:
+```
+<type>[optional scope]: <description>
+
+[optional body]
+```
+
+**Types:** `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+**Example:**
+```
+feat(mcp): add knowledge_delete tool for bulk deletion
+
+Implements knowledge_delete MCP tool for removing entries by URL.
+Supports wildcard patterns for bulk operations.
+```
+
+## 4. Documentation Sync Rules
+
+**CRITICAL: Keep docs and changelog synchronized with code changes.**
+
+### What to Update When
+
+| Change Type | Files to Update |
+|-------------|-----------------|
+| Add/modify component or agent | `docs/architecture.md` + `CHANGELOG.md` |
+| Change data flow | `docs/architecture.md` |
+| Add/modify API endpoint | `docs/technical-reference.md` + `CHANGELOG.md` |
+| Add/modify MCP tool | `docs/technical-reference.md` + `CHANGELOG.md` |
+| Add/modify SSE event | `docs/technical-reference.md` |
+| Change config options | `docs/technical-reference.md` + `CHANGELOG.md` |
+| Adjust build phases | `docs/implementation-plan.md` |
+| User-facing feature | `CHANGELOG.md` (under `[Unreleased]` → `Added`) |
+| Bug fix | `CHANGELOG.md` (under `[Unreleased]` → `Fixed`) |
+| Breaking change | `CHANGELOG.md` (under `[Unreleased]` → `Changed`) |
+| Major refactor | Review ALL docs + `CHANGELOG.md` |
+
+### Documentation Update Process
+1. Make code changes
+2. **Immediately** update relevant doc sections (see table above)
+3. Update `CHANGELOG.md` if user-facing change
+4. Keep changes concise and factual
+5. Remove outdated information
+
+### Changelog Management
+
+**When to update CHANGELOG.md:**
+- New features (`feat` commits) → `Added` section
+- Bug fixes (`fix` commits) → `Fixed` section
+- Breaking changes → `Changed` section with clear migration notes
+- Deprecations → `Deprecated` section
+- Removals → `Removed` section
+- Security fixes → `Security` section
+
+**How to update:**
+1. Add entry under `[Unreleased]` section
+2. Use appropriate category (Added, Changed, Fixed, etc.)
+3. Write user-facing description (not implementation details)
+4. Keep it concise
+
+**Example:**
+```markdown
+## [Unreleased]
+
+### Added
+- Research agent with streaming responses and tool use visualization
+- Crawler agent with intelligent link filtering and user steering
+
+### Fixed
+- ChromaDB connection timeout on first startup
+```
+
+### Documentation Principles
+- **Lightweight:** Brief and code-focused
+- **Single Source of Truth:** Docs over code comments
+- **Always Current:** Update with every architectural change
+- **No Status Sections:** Avoid "current status" - docs reflect design, not progress
+
+## 5. Project Architecture Overview
+
+### Core System
+- **Research Agent** - Claude (Anthropic) with streaming responses and tool use
+- **Crawler Agent** - Ollama-powered intelligent crawler with user steering
+- **MCP Server** - FastMCP exposing memory (per-user) and knowledge (global) tools
+- **ChromaDB** - Dual collections: `memories_{user_id}` and `knowledge_global`
+- **Frontend** - Next.js 15 with real-time SSE streaming
+
+### Key Technologies
+- **Backend:** FastAPI, FastMCP, Anthropic SDK, Ollama, ChromaDB
+- **Frontend:** Next.js 15, React 19, shadcn/ui, TanStack Query
+- **Streaming:** Server-Sent Events (SSE)
+- **Config:** Pydantic Settings with YAML + runtime updates
+
+**Reference:** See `docs/architecture.md` for detailed component diagrams and data flows.
+
+## 6. Service Management
+
+### Quick Commands
+```bash
+make setup    # One-time setup (install deps, pull Ollama models)
+make start    # Start all services (MCP, API, Frontend)
+make stop     # Stop all services
+make dev      # Development mode with tmux
+make test     # Run tests
+make health   # Check service health
+```
+
+### Service Dependencies
+- **Ollama** - Must be running for embeddings and crawler LLM
+- **ChromaDB** - Automatically started (persistent storage in `data/chroma`)
+- **Anthropic API** - Requires valid API key in `.env`
+
+## 7. Common Development Tasks
+
+### Adding a New MCP Tool
+1. Read `docs/technical-reference.md` → MCP Tools section
+2. Add tool in `backend/mcp_server/memory_tools.py` or `knowledge_tools.py`
+3. Use `@mcp.tool()` decorator with docstring
+4. Update `docs/technical-reference.md` with tool signature and example
+5. Update `CHANGELOG.md` under `[Unreleased]` → `Added`
+6. Test the tool manually via MCP server
+
+### Adding a New API Endpoint
+1. Check `docs/technical-reference.md` → API Endpoints
+2. Add route in appropriate file: `backend/api/{research,crawler,knowledge,memory,config}.py`
+3. Use Pydantic models for request/response
+4. Add SSE streaming if needed (see existing examples)
+5. Update `docs/technical-reference.md` with endpoint spec
+6. Update `CHANGELOG.md` if user-facing
+7. Test with `curl` or API docs at http://localhost:8000/docs
+
+### Adding a Frontend Component
+1. Follow Next.js 15 App Router conventions
+2. Place in `frontend/src/components/{feature}/`
+3. Use shadcn/ui components when possible
+4. For streaming, use the `useSSE` hook
+5. Update `CHANGELOG.md` if user-facing feature
+6. Test in browser
+
+### Modifying Configuration
+1. Update `backend/core/config.py` (Pydantic model)
+2. Update `backend/config.yaml` (default values)
+3. If UI-exposed: Update settings page component
+4. Update `docs/technical-reference.md` → Configuration section
+5. Update `CHANGELOG.md` under `[Unreleased]` → `Changed`
+
+### Working with SSE Streams
+1. Backend: Use FastAPI's `EventSourceResponse` or yield SSE format
+2. Frontend: Use `EventSource` API or `useSSE` hook
+3. Event format: `event: <type>\ndata: <json>\n\n`
+4. Reference `docs/technical-reference.md` → SSE Event Schemas
+
+## 8. Testing Guidelines
+
+### What to Test
+- **MCP Tools:** Test each tool's functionality
+- **API Endpoints:** Test request/response for critical routes
+- **Agents:** Test streaming behavior and tool calls (integration tests)
+- **Frontend:** Test critical user flows
+
+### Running Tests
+```bash
+make test                          # All tests
+cd backend && source venv/bin/activate
+pytest tests/                      # Backend only
+cd frontend && npm test            # Frontend only
+```
+
+## 9. Important Notes
+
+### ChromaDB Collections
+- `memories_{user_id}` - Per-user memory isolation
+- `knowledge_global` - Shared knowledge base
+- Collections auto-created on first use
+
+### Streaming Best Practices
+- Always close SSE streams properly
+- Handle reconnection in frontend
+- Emit progress events for long operations
+- Use typed events (don't just send text)
+
+### Config Management
+- Runtime updates save to `config.yaml`
+- Pydantic validates all changes
+- UI can edit via Settings page
+- Environment variables override config file
+
+## 10. Research, Testing & References
+
+### Using Exa for Code Research
+**When to use:** Searching for implementation patterns, library documentation, or code examples.
+
+**Tool:** `mcp__exa__get_code_context_exa`
+
+**Use cases:**
+- Finding implementation patterns: `mcp__exa__get_code_context_exa("FastAPI SSE streaming implementation")`
+- Library documentation: `mcp__exa__get_code_context_exa("ChromaDB Python client usage examples")`
+- API references: `mcp__exa__get_code_context_exa("Anthropic Python SDK streaming")`
+- Framework patterns: `mcp__exa__get_code_context_exa("Next.js 15 Server-Sent Events client")`
+- Specific features: `mcp__exa__get_code_context_exa("Pydantic Settings YAML configuration")`
+
+**Best practices:**
+- Use specific, descriptive queries
+- Include library/framework names
+- Search for recent implementations (mention version if needed)
+- Look for official documentation first, then community examples
+
+### Using Chrome DevTools MCP for UI Testing
+**When to use:** Testing frontend components, debugging UI issues, inspecting network requests.
+
+**Available tools:**
+- `mcp__chrome-devtools__take_snapshot` - Capture page structure
+- `mcp__chrome-devtools__click` - Interact with UI elements
+- `mcp__chrome-devtools__fill` - Fill forms
+- `mcp__chrome-devtools__list_network_requests` - Inspect API calls
+- `mcp__chrome-devtools__list_console_messages` - Check browser console
+- `mcp__chrome-devtools__take_screenshot` - Visual verification
+
+**Testing workflow:**
+1. Start frontend: `make dev`
+2. Take snapshot: `mcp__chrome-devtools__take_snapshot()`
+3. Interact with UI: `mcp__chrome-devtools__click(uid="element_id")`
+4. Verify network calls: `mcp__chrome-devtools__list_network_requests()`
+5. Check for errors: `mcp__chrome-devtools__list_console_messages()`
+6. Take screenshot: `mcp__chrome-devtools__take_screenshot()`
+
+**Use cases:**
+- Testing Research Agent chat streaming
+- Verifying Crawler Agent link steering UI
+- Debugging SSE connection issues
+- Testing Settings page config updates
+- Inspecting API request/response payloads
+
+### Key Reference Implementations
+- **RAG/Crawler:** `/Users/suraj-devloper/workspace/code-context`
+- **UI/Frontend:** `/Users/suraj-devloper/workspace/ui-agentx`
+
+## 11. Quick Reference
+
+### Documentation Files
+- `docs/architecture.md` - System design & components
+- `docs/implementation-plan.md` - Build phases & checkpoints
+- `docs/technical-reference.md` - API/tool specs & examples
+- `CHANGELOG.md` - User-facing changes
+
+**Keep all synchronized with code changes!**

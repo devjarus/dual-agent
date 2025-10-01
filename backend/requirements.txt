@@ -1,0 +1,30 @@
+# Core dependencies
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.3
+pydantic-settings>=2.1.0
+
+# AI & LLM
+anthropic>=0.18.0
+ollama>=0.1.6
+
+# Vector DB
+chromadb>=0.4.22
+
+# MCP
+fastmcp>=0.2.0
+
+# Web scraping
+httpx>=0.26.0
+beautifulsoup4>=4.12.3
+lxml>=5.1.0
+robotexclusionrulesparser>=1.7.0
+
+# Utilities
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+tenacity>=8.2.3
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
