@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests for configuration and ChromaDB service
 - Pre-commit hooks for code quality and testing
 - Test coverage reporting
+- FastAPI application with CORS middleware and structured routing
+- Research Agent API with SSE streaming endpoints
+- Crawler Agent API with job management and user steering
+- Knowledge base API (search, browse, delete, stats)
+- Memory API for per-user memory management
+- Configuration API (get, update, reload, reset, validate)
 
 ### Changed
 
