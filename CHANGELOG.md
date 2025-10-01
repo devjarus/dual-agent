@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Knowledge base API (search, browse, delete, stats)
 - Memory API for per-user memory management
 - Configuration API (get, update, reload, reset, validate)
+- Next.js 15 frontend application with App Router
+- TanStack Query for data fetching and caching
+- Tailwind CSS with custom design system
+- Research Agent page with real-time SSE chat streaming
+- Crawler Agent page with job management and user steering
+- Knowledge Explorer with search and browse functionality
+- Settings page for runtime configuration management
+- Responsive navigation and layout components
+- Custom hooks for SSE streaming (Research and Crawler)
 
 ### Changed
 
